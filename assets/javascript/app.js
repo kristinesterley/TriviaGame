@@ -6,8 +6,13 @@ var currentQuestion = 0;
 
 //variable to hold setInterval that runs the round timer
 var secondCounter;
-var TIMELIMIT = 15;
-var WAIT = 5;
+//constants for the timer in the game
+var TIMELIMIT = 15;  //time limit (in seconds) to answer each question
+var WAIT = 5; //number seconds to wait for the user to read the result
+
+var TIMEUP = -1;
+
+//timer for each round
 
 var roundTimer = {
 
@@ -27,13 +32,14 @@ var roundTimer = {
 		roundTimer.time--;
 		$(".time-remaining").html("Time Remaining: "+ roundTimer.time + " seconds.");
 		if (roundTimer.time===0){
+			//stop the timer, then send processAnswer indication that the user did not answer
 			clearInterval(secondCounter);
-			processAnswer(-1);
-			//do something to stop the round
+			processAnswer(TIMEUP);			
 		}
 	}
-
 } //end roundTimer definition
+
+//questions and answers 
 
 var round = [
 {
@@ -54,8 +60,27 @@ var round = [
 		}
 		]
 },
+
 {
-	question: "Spinning hay when playing dreidel during Hanukkah results in:",
+	question: "The Columbian celebration called the Day of the Little Candles includes:",
+	aImage: "assets/images/columbia.jpg",
+	answers:  [ 
+		{	a: "Candles and Lanterns",
+			v: false
+		},
+		{	a:"Fireworks",
+			v:false
+		},
+		{	a:"Music",
+			v:false
+		},
+		{	a:"All of the Above",
+			v:true
+		}
+		]
+},
+{
+	question: "Spinning 'hey' when playing dreidel during Hanukkah results in:",
 	aImage: "assets/images/dreidel.jpeg",
 	answers:  [ 
 		{	a: "Nothing",
@@ -69,6 +94,24 @@ var round = [
 		},
 		{	a:"Adding to the Pot",
 			v:false
+		}
+		]
+},
+{	
+	question: "Kwanzaa, a celebration of African and American culture, lasts for:",
+	aImage: "assets/images/kwanzaa.jpeg",
+	answers:  [ 
+		{	a: "3 days",
+			v: false
+		},
+		{	a:"5 days",
+			v:false
+		},
+		{	a:"6 days",
+			v:false
+		},
+		{	a:"7 days",
+			v:true
 		}
 		]
 },
@@ -92,6 +135,7 @@ var round = [
 		]
 }
 ]
+//beginGame initializes variables and sets up the start screen
 
 	function beginGame(){
 		correct=0;
@@ -109,6 +153,8 @@ var round = [
 
 	}//end beginGame
 
+	// sets up the screen for a question
+
 	function displayCurrentQuestion(){
 		roundTimer.start();
 		$(".time-remaining").html("Time Remaining: "+ TIMELIMIT + " seconds.");
@@ -123,13 +169,15 @@ var round = [
 		$.each(round[currentQuestion].answers, function (index,value){
 			var btnName = ".button"+index;
 			$(btnName).text(value.a);
+
 		}); //end looping through answers for a fixed question
 
 
 	}//end displayCurrentQuestion
 
 
-
+// accepts the button number for the answer, checks if it is correct, displays result then waits
+// before calling the nextUp function 
 
 	function processAnswer(j) {
 		var indexCorrect;
@@ -144,7 +192,7 @@ var round = [
 			}
 		}	
 
-		if (j===-1){
+		if (j===TIMEUP){
 			unanswered++;
 			result = "Out of Time!";
 		}
@@ -155,7 +203,7 @@ var round = [
 				} 
 		else {
 				wrong++;
-				result="Nope!";
+				result="Sorry!";
 			}
 			
 	
@@ -171,10 +219,11 @@ var round = [
 
 	}
 
+
 	function nextUp () {
 
-		//display result for this question
-		//wait 5 seconds then either show end of game or next question
+
+		//show end of game or next question
 
 		if (currentQuestion === round.length-1) {
 
